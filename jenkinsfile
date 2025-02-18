@@ -43,6 +43,7 @@ pipeline{
                     }
                 }              
             }
+        }
             post{
                 success{
                     echo 'Image pushed successfully'
@@ -51,4 +52,3 @@ pipeline{
                     echo 'Pipeline failed'
                 }
             }
-}
