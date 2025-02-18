@@ -1,0 +1,54 @@
+pipeline{
+    agent any
+    environment{
+        DOCKERHUB_USERNAME = 'indhirapriyadarsini26'
+        IMAGE_NAME = 'docker-jenkins'
+        IMAGE_TAG = 'latest'
+    }
+    stages{
+        stage('clone repo'){
+            steps{
+                echo 'Cloning the repo...'
+                script{
+                    git clone 'https://github.com/indhiraPriyadarsini/docker-jenkins.git'
+                    npm install
+                }
+            }
+            
+        }
+        stage('build'){
+            steps{
+                echo 'Building the project...'
+                script{
+                    sh 'docker build -t $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG .'
+
+                }
+            }    
+        }
+        stage('Docker login'){
+            steps{
+                echo 'Logging into Dockerhub...'
+                script{
+                    withCredentials[string(credentialsId: 'c1942a61-40e0-4253-b25f-6cc44316d6eb', variable: 'PASSWORD')]
+                    sh 'echo $PASSWORD | docker login -u $DOCKERHUB_USERNAME -p --password-stdin'
+                    }
+                }              
+            }          
+        }
+        stage('Docker push'){
+            steps{
+                echo 'Pushing image into Dockerhub...'
+                script{
+                    sh 'docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG'
+                    }
+                }              
+            }
+            post{
+                success{
+                    echo 'Image pushed successfully'
+                }
+                failure{
+                    echo 'Pipeline failed'
+                }
+            }
+}
