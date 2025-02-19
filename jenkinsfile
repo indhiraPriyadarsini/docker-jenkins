@@ -4,19 +4,20 @@ pipeline {
         DOCKERHUB_USERNAME = 'indhirapriyadarsini26'
         IMAGE_NAME = 'docker-jenkins'
         IMAGE_TAG = 'latest'
+        ENV_NAME = "${env.BRANCH_NAME}"
     }
     
     stages {
         stage('Clone Repo') {
             steps {
-                echo 'Cloning the repository...'
+                echo 'Cloning the ${ENV_NAME} repository...'
                 checkout scm  
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                echo 'Installing dependencies...'
+                echo 'Installing dependencies in ${ENV_NAME}...'
                 script {
                     sh 'npm install'
                 }
@@ -27,7 +28,7 @@ pipeline {
             parallel{
                 stage('Unit Test'){
                     steps{
-                        echo "Running unit tests..."
+                        echo "Running unit tests for ${ENV_NAME}..."
                         script{
                             sh 'npm test'
                         }
@@ -35,7 +36,7 @@ pipeline {
                 }
                 stage('Security Test'){
                     steps{
-                        echo "Running security tests..."
+                        echo "Running security tests for ${ENV_NAME}..."
                         script{
                             sh 'npm audit'
                         }
@@ -76,10 +77,10 @@ pipeline {
 
     post {
         success {
-            echo 'Image pushed successfully to Docker Hub!'
+            echo 'Image from ${ENV_NAME} pushed successfully to Docker Hub!'
         }
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed for ${ENV_NAME}!'
         }
     }
 }
