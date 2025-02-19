@@ -10,7 +10,7 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 echo 'Cloning the repository...'
-                checkout scm  // Correct way to clone in Jenkins
+                checkout scm  
             }
         }
 
@@ -19,6 +19,27 @@ pipeline {
                 echo 'Installing dependencies...'
                 script {
                     sh 'npm install'
+                }
+            }
+        }
+
+        stage('Parallel execution'){
+            parallel{
+                stage('Unit Test'){
+                    steps{
+                        echo "Running unit tests..."
+                        script{
+                            sh 'npm test'
+                        }
+                    }
+                }
+                stage('Security Test'){
+                    steps{
+                        echo "Running security tests..."
+                        script{
+                            sh 'npm audit'
+                        }
+                    }
                 }
             }
         }
